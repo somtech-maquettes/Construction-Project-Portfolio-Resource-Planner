@@ -40,7 +40,7 @@ function Navigation() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-2">
-              <LayoutDashboard className="w-8 h-8 text-blue-600" />
+              <div className="w-8 h-8 bg-green-500 rounded-sm"></div>
               <span className="text-xl font-bold text-gray-900">
                 Gauthier Lens
               </span>
