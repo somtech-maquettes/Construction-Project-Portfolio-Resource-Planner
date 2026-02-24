@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { mockProjects } from '../data/mockProjects';
+import { useProjects } from '../contexts/ProjectContext';
 import {
   TrendingUp,
   DollarSign,
@@ -11,17 +11,18 @@ import {
   ArrowDown } from
 'lucide-react';
 export function Dashboard() {
+  const { projects } = useProjects();
   const currentYear = 2025;
   const currentMonth = new Date().getMonth() + 1;
   const stats = useMemo(() => {
-    const activeProjects = mockProjects.filter(
+    const activeProjects = projects.filter(
       (p) => p.state === 'Exécution' || p.state === 'Pré-construction'
     );
-    const totalRevenue = mockProjects.reduce(
+    const totalRevenue = projects.reduce(
       (sum, p) => sum + p.contractAmount,
       0
     );
-    const totalProfit = mockProjects.reduce(
+    const totalProfit = projects.reduce(
       (sum, p) => sum + p.estimatedProfit,
       0
     );
@@ -33,7 +34,7 @@ export function Dashboard() {
       const year = currentMonth + i > 12 ? currentYear + 1 : currentYear;
       const monthKey = `${year}-${String(month).padStart(2, '0')}`;
       let monthRevenue = 0;
-      mockProjects.forEach((project) => {
+      projects.forEach((project) => {
         if (project.monthlyProjections[monthKey]) {
           monthRevenue += project.monthlyProjections[monthKey];
         }
@@ -44,7 +45,7 @@ export function Dashboard() {
       });
     }
     // Top 5 projets par valeur
-    const topProjects = [...mockProjects].
+    const topProjects = [...projects].
     sort((a, b) => b.contractAmount - a.contractAmount).
     slice(0, 5);
     return {
@@ -57,7 +58,7 @@ export function Dashboard() {
       revenueYTD: totalRevenue * 0.65,
       projectedRevenue: totalRevenue
     };
-  }, [currentMonth, currentYear]);
+  }, [currentMonth, currentYear, projects]);
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('fr-CA', {
       style: 'currency',

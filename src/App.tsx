@@ -9,6 +9,7 @@ import {
 import { Portfolio } from './pages/Portfolio';
 import { Projections } from './pages/Projections';
 import { Dashboard } from './pages/Dashboard';
+import { ProjectProvider } from './contexts/ProjectContext';
 import {
   LayoutDashboard,
   FolderKanban,
@@ -72,15 +73,17 @@ function Navigation() {
 }
 export function App() {
   return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <Routes>
-          <Route path="/" element={<Portfolio />} />
-          <Route path="/projections" element={<Projections />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-        </Routes>
-      </div>
-    </BrowserRouter>);
+    <ProjectProvider>
+      <BrowserRouter>
+        <div className="min-h-screen bg-gray-50">
+          <Navigation />
+          <Routes>
+            <Route path="/" element={<Portfolio />} />
+            <Route path="/projections" element={<Projections />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+          </Routes>
+        </div>
+      </BrowserRouter>
+    </ProjectProvider>);
 
 }

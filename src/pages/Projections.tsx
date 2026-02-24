@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { mockProjects } from '../data/mockProjects';
+import { useProjects } from '../contexts/ProjectContext';
 import {
   Calendar,
   TrendingUp,
@@ -9,6 +9,7 @@ import {
   ArrowDown } from
 'lucide-react';
 export function Projections() {
+  const { projects } = useProjects();
   const [selectedYear, setSelectedYear] = useState(2025);
   const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart');
   const monthlyData = useMemo(() => {
@@ -32,7 +33,7 @@ export function Projections() {
       let totalProfit = 0;
       let totalMOD = 0;
       const projectsInMonth: string[] = [];
-      mockProjects.forEach((project) => {
+      projects.forEach((project) => {
         if (project.monthlyProjections[monthKey]) {
           const sales = project.monthlyProjections[monthKey];
           totalSales += sales;
@@ -53,7 +54,7 @@ export function Projections() {
       };
     });
     return data;
-  }, [selectedYear]);
+  }, [selectedYear, projects]);
   const maxSales = Math.max(...monthlyData.map((d) => d.sales));
   const totalYearSales = monthlyData.reduce((sum, d) => sum + d.sales, 0);
   const totalYearProfit = monthlyData.reduce((sum, d) => sum + d.profit, 0);

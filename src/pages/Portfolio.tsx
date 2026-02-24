@@ -6,13 +6,15 @@ import { PortfolioFilters } from '../components/PortfolioFilters';
 import { StateDistributionChart } from '../components/StateDistributionChart';
 import { ProjectDetailModal } from '../components/ProjectDetailModal';
 import { ProjectEditModal } from '../components/ProjectEditModal';
+import { ProjectCreateModal } from '../components/ProjectCreateModal';
 import { ExportButton } from '../components/ExportButton';
 import { ViewToggle } from '../components/ViewToggle';
 import { ToastContainer } from '../components/Toast';
 import { useToast } from '../hooks/useToast';
-import { mockProjects } from '../data/mockProjects';
+import { useProjects } from '../contexts/ProjectContext';
 import { Project, ProjectState, PortfolioStats } from '../types/project';
 export function Portfolio() {
+  const { projects, addProject, updateProject } = useProjects();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedState, setSelectedState] = useState<ProjectState | 'all'>(
     'all'
@@ -23,9 +25,10 @@ export function Portfolio() {
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [creatingProject, setCreatingProject] = useState(false);
   const { toasts, showToast, removeToast } = useToast();
   const filteredProjects = useMemo(() => {
-    let filtered = mockProjects.filter((project) => {
+    let filtered = projects.filter((project) => {
       const matchesSearch =
       project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       project.number.toLowerCase().includes(searchTerm.toLowerCase());
@@ -55,7 +58,7 @@ export function Portfolio() {
     return filtered;
   }, [searchTerm, selectedState, selectedYear, sortBy, profitRange]);
   const stats: PortfolioStats = useMemo(() => {
-    return mockProjects.reduce(
+    return projects.reduce(
       (acc, project) => {
         acc.totalContractValue += project.contractAmount;
         acc.totalEstimatedProfit += project.estimatedProfit;
@@ -73,11 +76,16 @@ export function Portfolio() {
     );
   }, []);
   const handleSaveProject = (updatedProject: Project) => {
-    // En production, ceci ferait un appel API pour sauvegarder
-    console.log('Saving project:', updatedProject);
+    updateProject(updatedProject);
     showToast('Projet mis à jour avec succès', 'success');
     setEditingProject(null);
     setSelectedProject(null);
+  };
+
+  const handleCreateProject = (newProject: Project) => {
+    addProject(newProject);
+    showToast('Projet créé avec succès', 'success');
+    setCreatingProject(false);
   };
   const handleEditClick = () => {
     if (selectedProject) {
@@ -105,7 +113,7 @@ export function Portfolio() {
               onExport={(message) => showToast(message, 'success')} />
 
             <button
-              onClick={() => showToast('Fonctionnalité à venir', 'info')}
+              onClick={() => setCreatingProject(true)}
               className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
 
               <Plus className="w-5 h-5" />
@@ -184,6 +192,14 @@ export function Portfolio() {
         project={editingProject}
         onClose={() => setEditingProject(null)}
         onSave={handleSaveProject} />
+
+      }
+
+      {creatingProject &&
+      <ProjectCreateModal
+        onClose={() => setCreatingProject(false)}
+        onSave={handleCreateProject}
+        existingProjects={projects} />
 
       }
     </div>);
